@@ -1,45 +1,31 @@
-import { useEffect, useState } from "react";
-import { jwtDecode} from "jwt-decode";
-import api from "../utils/api"
+import Layout from "../components/Layout";
+import Navbar from "../components/Navbar";
+import Card from "../components/Card";
 
 function Dashboard() {
-  const [user, setUser] = useState(null);
-
-  useEffect(() => {
-    const getProfile = async () => {
-      try {
-        const res = await api.get("/profile");
-        console.log(res.data);
-        // Menyimpan data user dari backend ke state React
-        setUser(res.data.user);
-      } catch (err) {
-        console.error("Gagal mengambil data profile");
-      }
-    };
-
-    getProfile();
-  }, []);
-
-  const handleLogout = () => {
-    // Menghapus data di local storage
-    localStorage.removeItem("token");
-    localStorage.removeItem("user");
-    localStorage.removeItem("respon");
-    window.location.href = "/";
-  };
-
   return (
-    <div>
-      <h2>Dashboard</h2>
+    <Layout>
+      <Navbar />
 
-      {user && (
-        <p>
-          Login sebagai: <b>{user.email}</b>
-        </p>
-      )}
+      <div className="grid grid-cols-3 gap-4">
 
-      <button onClick={handleLogout}>Logout</button>
-    </div>
+        <Card>
+          <h2 className="font-bold">Total Produk</h2>
+          <p>100</p>
+        </Card>
+
+        <Card>
+          <h2 className="font-bold">Total Transaksi</h2>
+          <p>50</p>
+        </Card>
+
+        <Card>
+          <h2 className="font-bold">Pendapatan</h2>
+          <p>Rp 1.000.000</p>
+        </Card>
+
+      </div>
+    </Layout>
   );
 }
 
