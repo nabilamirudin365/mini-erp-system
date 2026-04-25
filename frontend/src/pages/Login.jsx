@@ -1,49 +1,74 @@
 import { useState } from "react";
- import api from "../utils/api";
+import { Link, useNavigate } from "react-router-dom";
+import api from "../utils/api";
 
 function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [message, setMessage] = useState("");
+  const navigate = useNavigate();
 
-const handleLogin = async () => {
-  try {
-    const res = await api.post("/login", {
-      email,
-      password,
-    });
+  const handleLogin = async (e) => {
+    e.preventDefault();
+    try {
+      const res = await api.post("/auth/login", {
+        email,
+        password,
+      });
 
-    localStorage.setItem("token", res.data.token);
-
-    window.location.href = "/dashboard";
-  } catch (err) {
-    setMessage("Login gagal");
-  }
-};
+      localStorage.setItem("token", res.data.token);
+      navigate("/dashboard");
+    } catch (err) {
+      setMessage(err.response?.data?.message || "Login gagal");
+    }
+  };
 
   return (
-    <div>
-      <h2>Login</h2>
+    <div className="min-h-screen bg-pink-300 flex items-center justify-center p-4">
+      <div className="bg-white p-8 w-full max-w-md brutal">
+        <h2 className="text-3xl font-black mb-6 text-center uppercase tracking-wider bg-yellow-300 p-2 brutal-sm">Login ERP</h2>
 
-      <input
-        type="email"
-        placeholder="Email"
-        onChange={(e) => setEmail(e.target.value)}
-      />
+        {message && (
+          <div className="bg-red-400 p-3 mb-4 brutal-sm font-bold text-black">
+            {message}
+          </div>
+        )}
 
-      <br />
+        <form onSubmit={handleLogin} className="flex flex-col gap-4">
+          <div>
+            <label className="block font-bold mb-1">Email</label>
+            <input
+              type="email"
+              placeholder="Masukkan email"
+              onChange={(e) => setEmail(e.target.value)}
+              className="w-full p-3 border-4 border-black outline-none focus:bg-blue-100 transition-colors"
+              required
+            />
+          </div>
 
-      <input
-        type="password"
-        placeholder="Password"
-        onChange={(e) => setPassword(e.target.value)}
-      />
+          <div>
+            <label className="block font-bold mb-1">Password</label>
+            <input
+              type="password"
+              placeholder="Masukkan password"
+              onChange={(e) => setPassword(e.target.value)}
+              className="w-full p-3 border-4 border-black outline-none focus:bg-blue-100 transition-colors"
+              required
+            />
+          </div>
 
-      <br />
+          <button 
+            type="submit" 
+            className="w-full bg-blue-500 text-white font-black text-lg py-3 mt-4 brutal-btn"
+          >
+            MASUK
+          </button>
+        </form>
 
-      <button onClick={handleLogin}>Login</button>
-
-      <p>{message}</p>
+        <p className="mt-6 text-center font-bold">
+          Belum punya akun? <Link to="/register" className="text-blue-600 underline hover:bg-yellow-200 px-1">Daftar sekarang</Link>
+        </p>
+      </div>
     </div>
   );
 }

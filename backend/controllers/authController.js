@@ -3,37 +3,53 @@ import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 
 export const register = async (req, res) => {
-  const { email, password } = req.body;
+  try {
+    const { email, password, role_id } = req.body;
 
-  const hash = await bcrypt.hash(password, 10);
+    if (!email || !password) {
+      return res.status(400).json({ message: "Email dan password wajib diisi" });
+    }
 
-  await pool.query(
-    "INSERT INTO users (email, password, role_id) VALUES ($1, $2, 2)",
-    [email, hash]
-  );
+    // Pastikan password berformat string (karena bcrypt butuh string murni)
+    const stringPassword = String(password);
+    const hash = await bcrypt.hash(stringPassword, 10);
 
-  res.json({ message: "Register berhasil" });
+    await pool.query(
+      "INSERT INTO users (email, password, role_id) VALUES ($1, $2, $3)",
+      [email, hash, role_id || 2]
+    );
+
+    res.json({ message: "Register berhasil" });
+  } catch (error) {
+    console.error("Register Error:", error);
+    res.status(500).json({ message: error.message || "Terjadi kesalahan pada server saat register" });
+  }
 };
 
 export const login = async (req, res) => {
-  const { email, password } = req.body;
+  try {
+    const { email, password } = req.body;
 
-  const result = await pool.query(
-    "SELECT users.*, roles.name as role FROM users JOIN roles ON users.role_id = roles.id WHERE email=$1",
-    [email]
-  );
+    const result = await pool.query(
+      "SELECT users.*, roles.name as role FROM users LEFT JOIN roles ON users.role_id = roles.id WHERE email=$1",
+      [email]
+    );
 
-  const user = result.rows[0];
+    const user = result.rows[0];
 
-  if (!user) return res.status(400).json({ message: "User tidak ada" });
+    if (!user) return res.status(400).json({ message: "User tidak ada" });
 
-  const valid = await bcrypt.compare(password, user.password);
-  if (!valid) return res.status(400).json({ message: "Password salah" });
+    const valid = await bcrypt.compare(password, user.password);
+    if (!valid) return res.status(400).json({ message: "Password salah" });
 
-  const token = jwt.sign(
-    { id: user.id, email: user.email, role: user.role },
-    process.env.JWT_SECRET
-  );
+    const token = jwt.sign(
+      { id: user.id, email: user.email, role: user.role || 'user' },
+      process.env.JWT_SECRET
+    );
 
-  res.json({ token });
+    res.json({ token });
+  } catch (error) {
+    console.error("Login Error:", error);
+    res.status(500).json({ message: error.message || "Terjadi kesalahan pada server saat login" });
+  }
 };
