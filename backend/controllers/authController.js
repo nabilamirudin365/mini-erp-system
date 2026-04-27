@@ -1,28 +1,17 @@
-import { pool } from "../config/db.js";
-import bcrypt from "bcrypt";
-import jwt from "jsonwebtoken";
+import * as authService from "../services/authService.js";
 
 export const register = async (req, res) => {
   try {
     const { email, password, role_id } = req.body;
 
-    if (!email || !password) {
-      return res.status(400).json({ message: "Email dan password wajib diisi" });
-    }
+    // Controller hanya meneruskan data ke Service (Tidak ada logika DB/Bcrypt disini)
+    await authService.registerUser(email, password, role_id);
 
-    // Pastikan password berformat string (karena bcrypt butuh string murni)
-    const stringPassword = String(password);
-    const hash = await bcrypt.hash(stringPassword, 10);
-
-    await pool.query(
-      "INSERT INTO users (email, password, role_id) VALUES ($1, $2, $3)",
-      [email, hash, role_id || 2]
-    );
-
-    res.json({ message: "Register berhasil" });
+    // Controller murni mengurus respons (HTTP status dan JSON)
+    res.status(201).json({ message: "Register berhasil" });
   } catch (error) {
     console.error("Register Error:", error);
-    res.status(500).json({ message: error.message || "Terjadi kesalahan pada server saat register" });
+    res.status(400).json({ message: error.message || "Terjadi kesalahan pada server saat register" });
   }
 };
 
@@ -30,26 +19,13 @@ export const login = async (req, res) => {
   try {
     const { email, password } = req.body;
 
-    const result = await pool.query(
-      "SELECT users.*, roles.name as role FROM users LEFT JOIN roles ON users.role_id = roles.id WHERE email=$1",
-      [email]
-    );
+    // Panggil Service
+    const result = await authService.loginUser(email, password);
 
-    const user = result.rows[0];
-
-    if (!user) return res.status(400).json({ message: "User tidak ada" });
-
-    const valid = await bcrypt.compare(password, user.password);
-    if (!valid) return res.status(400).json({ message: "Password salah" });
-
-    const token = jwt.sign(
-      { id: user.id, email: user.email, role: user.role || 'user' },
-      process.env.JWT_SECRET
-    );
-
-    res.json({ token });
+    // Kembalikan token ke user
+    res.json({ token: result.token });
   } catch (error) {
     console.error("Login Error:", error);
-    res.status(500).json({ message: error.message || "Terjadi kesalahan pada server saat login" });
+    res.status(400).json({ message: error.message || "Terjadi kesalahan pada server saat login" });
   }
 };

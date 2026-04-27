@@ -1,17 +1,21 @@
-import { pool } from "../config/db.js";
+import * as productService from "../services/productService.js";
 
 export const getProducts = async (req, res) => {
-  const result = await pool.query("SELECT * FROM products");
-  res.json(result.rows);
+  try {
+    const products = await productService.getAllProducts();
+    res.json(products);
+  } catch (error) {
+    console.error("Get Products Error:", error);
+    res.status(500).json({ message: "Gagal mengambil data produk" });
+  }
 };
 
 export const createProduct = async (req, res) => {
-  const { name, price, stock, category_id } = req.body;
-
-  await pool.query(
-    "INSERT INTO products (name, price, stock, category_id) VALUES ($1,$2,$3,$4)",
-    [name, price, stock, category_id]
-  );
-
-  res.json({ message: "Product dibuat" });
+  try {
+    await productService.createNewProduct(req.body);
+    res.status(201).json({ message: "Product dibuat" });
+  } catch (error) {
+    console.error("Create Product Error:", error);
+    res.status(400).json({ message: error.message || "Gagal membuat produk" });
+  }
 };

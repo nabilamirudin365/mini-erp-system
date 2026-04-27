@@ -1,0 +1,73 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model users {
+  id         Int       @id @default(autoincrement())
+  email      String    @unique
+  password   String
+  role_id    Int?
+  created_at DateTime? @default(now())
+
+  role         roles?         @relation(fields: [role_id], references: [id])
+  transactions transactions[]
+}
+
+model roles {
+  id   Int     @id @default(autoincrement())
+  name String?
+
+  users users[]
+}
+
+model categories {
+  id   Int     @id @default(autoincrement())
+  name String?
+
+  products products[]
+}
+
+model products {
+  id          Int       @id @default(autoincrement())
+  name        String?
+  price       Int?
+  stock       Int?
+  category_id Int?
+  created_at  DateTime? @default(now())
+
+  category          categories?         @relation(fields: [category_id], references: [id])
+  transaction_items transaction_items[]
+
+  @@index([category_id])
+}
+
+model transactions {
+  id         Int       @id @default(autoincrement())
+  user_id    Int?
+  total      Int?
+  created_at DateTime? @default(now())
+
+  user              users?              @relation(fields: [user_id], references: [id])
+  transaction_items transaction_items[]
+
+  @@index([user_id])
+}
+
+model transaction_items {
+  id             Int  @id @default(autoincrement())
+  transaction_id Int?
+  product_id     Int?
+  qty            Int?
+  price          Int?
+
+  transaction transactions? @relation(fields: [transaction_id], references: [id])
+  product     products?     @relation(fields: [product_id], references: [id])
+
+  @@index([transaction_id])
+  @@index([product_id])
+}

@@ -1,45 +1,23 @@
-const url = 'https://jsonplaceholder.typicode.com/users';
+import api from "../utils/api";
 
 export const getUsers = async () => {
-    try {
-        const response = await fetch(url);
-        if(!response.ok){
-            throw new Error('Gagal ambil user');
-        }
-        const data = await response.json();
-        return data;
-    } catch (err){
-        console.log("Error message" + err);
-    }
-}
-
-export const createUser = async (nama) => {
-    const res = await fetch(url, {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json'
-        }, 
-        body: JSON.stringify({
-            name: nama
-        })
-    });
-    return res.json();
-}
-
-export const deleteUser = async (id) => {
-    const res = await fetch(`${url}/${id}`, {
-        method: 'DELETE',
-    });
-    return res.json();
+  try {
+    // Axios otomatis akan mengambil baseURL (http://localhost:5000) dari utils/api.js
+    const response = await api.get('/users');
+    // Axios secara otomatis mengubah JSON response menjadi object JS di dalam properti `.data`
+    return response.data;
+  } catch (err) {
+    console.error("Error mengambil users:", err);
+    throw err;
+  }
 };
 
-export const updateUser = async (id,nama) => {
-    const res = await fetch(`${url}/${id}`, {
-        method: 'PUT',
-        headers: {
-            'Content-Type' : 'application/json'
-        }, 
-        body : JSON.stringify({ name: nama })
-    })
-}
-
+export const getUserById = async (id) => {
+  try {
+    const response = await api.get(`/users/${id}`);
+    return response.data;
+  } catch (err) {
+    console.error("Error mengambil detail user:", err);
+    throw err;
+  }
+};

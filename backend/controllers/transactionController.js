@@ -1,63 +1,27 @@
-import { pool } from "../config/db.js";
+import * as transactionService from "../services/transactionService.js";
 
 export const createTransaction = async (req, res) => {
-  const client = await pool.connect();
-
   try {
     const { items } = req.body; 
-    // items: [{ product_id, qty }]
 
-    await client.query("BEGIN");
-
-    // 1. buat transaksi
-    const trx = await client.query(
-      "INSERT INTO transactions (user_id, total) VALUES ($1, 0) RETURNING id",
-      [req.user.id]
-    );
-
-    const transactionId = trx.rows[0].id;
-
-    let total = 0;
-
-    // 2. loop item
-    for (let item of items) {
-      const product = await client.query(
-        "SELECT * FROM products WHERE id=$1",
-        [item.product_id]
-      );
-
-      const price = product.rows[0].price;
-
-      // insert item
-      await client.query(
-        "INSERT INTO transaction_items (transaction_id, product_id, qty, price) VALUES ($1,$2,$3,$4)",
-        [transactionId, item.product_id, item.qty, price]
-      );
-
-      // update stock
-      await client.query(
-        "UPDATE products SET stock = stock - $1 WHERE id=$2",
-        [item.qty, item.product_id]
-      );
-
-      total += price * item.qty;
+    // Controller bisa melakukan validasi struktur dasar
+    if (!items || !Array.isArray(items) || items.length === 0) {
+      return res.status(400).json({ message: "Keranjang belanja kosong" });
     }
 
-    // 3. update total transaksi
-    await client.query(
-      "UPDATE transactions SET total=$1 WHERE id=$2",
-      [total, transactionId]
-    );
+    // Panggil Service Layer untuk menangani proses database yang rumit
+    const result = await transactionService.createNewTransaction(req.user.id, items);
 
-    await client.query("COMMIT");
-
-    res.json({ message: "Transaksi berhasil", total });
+    res.status(201).json({ message: "Transaksi berhasil", total: result.total });
 
   } catch (err) {
-    await client.query("ROLLBACK");
-    console.error(err);
-    res.status(500).json({ message: "Gagal transaksi" });
-  } finally {
-    client.release();
+    console.error("Create Transaction Error:", err);
+    
+    // Tangkap error kustom (seperti stok habis) dan kembalikan 400
+    if (err.message.includes("Stok produk tidak mencukupi")) {
+      return res.status(400).json({ message: err.message });
+    }
+
+    res.status(500).json({ message: "Gagal transaksi: " + err.message });
   }
 };
