@@ -22,10 +22,25 @@ export const login = async (req, res) => {
     // Panggil Service
     const result = await authService.loginUser(email, password);
 
-    // Kembalikan token ke user
-    res.json({ token: result.token });
+    // Tanamkan token ke dalam HttpOnly Cookie (Brankas Browser)
+    res.cookie("token", result.token, {
+      httpOnly: true, // Tidak bisa dibaca oleh JavaScript
+      secure: process.env.NODE_ENV === "production", // True jika HTTPS
+      sameSite: "strict",
+      maxAge: 60 * 1000 // 1 Menit (sesuai masa berlaku JWT)
+    });
+
+    // Kembalikan role ke user agar frontend tahu statusnya
+    res.json({ 
+      role: result.user.role?.name || 'user'
+    });
   } catch (error) {
     console.error("Login Error:", error);
     res.status(400).json({ message: error.message || "Terjadi kesalahan pada server saat login" });
   }
+};
+
+export const logout = (req, res) => {
+  res.clearCookie("token"); // Hapus cookie
+  res.json({ message: "Berhasil logout" });
 };

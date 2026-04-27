@@ -4,6 +4,7 @@ import Register from "./pages/Register";
 import Dashboard from "./pages/Dashboard";
 import Transaction from "./pages/Transaction";
 import ProtectedRoute from "./components/ProtectedRoute";
+import UserList from "./components/UserList";
 
 function App() {
   return (
@@ -28,6 +29,14 @@ function App() {
           element={
             <ProtectedRoute>
               <Transaction />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/users"
+          element={
+            <ProtectedRoute>
+              <UserList />
             </ProtectedRoute>
           }
         />

@@ -43,3 +43,38 @@ export const getUserById = async (id) => {
 
   return user;
 };
+
+import bcrypt from "bcrypt";
+
+export const updateUser = async (id, data) => {
+  const userId = parseInt(id);
+  if (isNaN(userId)) throw new Error("ID tidak valid");
+
+  const { email, password, role_id } = data;
+  
+  const updateData = {};
+  if (email) updateData.email = email;
+  if (role_id) updateData.role_id = parseInt(role_id);
+  
+  // Jika admin menginputkan password baru, hash terlebih dahulu
+  if (password) {
+    updateData.password = await bcrypt.hash(String(password), 10);
+  }
+
+  const user = await prisma.users.update({
+    where: { id: userId },
+    data: updateData,
+    select: { id: true, email: true, role_id: true, created_at: true, role: { select: { name: true } } }
+  });
+
+  return user;
+};
+
+export const deleteUser = async (id) => {
+  const userId = parseInt(id);
+  if (isNaN(userId)) throw new Error("ID tidak valid");
+
+  await prisma.users.delete({
+    where: { id: userId }
+  });
+};

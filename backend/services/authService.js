@@ -44,7 +44,8 @@ export const loginUser = async (email, password) => {
 
   const token = jwt.sign(
     { id: user.id, email: user.email, role: user.role?.name || 'user' },
-    process.env.JWT_SECRET
+    process.env.JWT_SECRET,
+    { expiresIn: '1m' } // Token kedaluwarsa dalam 1 jam
   );
 
   return { token, user };

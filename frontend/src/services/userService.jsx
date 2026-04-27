@@ -2,9 +2,7 @@ import api from "../utils/api";
 
 export const getUsers = async () => {
   try {
-    // Axios otomatis akan mengambil baseURL (http://localhost:5000) dari utils/api.js
     const response = await api.get('/users');
-    // Axios secara otomatis mengubah JSON response menjadi object JS di dalam properti `.data`
     return response.data;
   } catch (err) {
     console.error("Error mengambil users:", err);
@@ -20,4 +18,19 @@ export const getUserById = async (id) => {
     console.error("Error mengambil detail user:", err);
     throw err;
   }
+};
+
+export const createUser = async (data) => {
+  const res = await api.post("/auth/register", data);
+  return res.data;
+};
+
+export const updateUser = async (id, data) => {
+  const res = await api.put(`/users/${id}`, data);
+  return res.data;
+};
+
+export const deleteUser = async (id) => {
+  const res = await api.delete(`/users/${id}`);
+  return res.data;
 };

@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import api from "../utils/api";
 
 function Login() {
@@ -16,7 +16,9 @@ function Login() {
         password,
       });
 
-      localStorage.setItem("token", res.data.token);
+      // Token otomatis ditanam ke HttpOnly Cookie oleh backend
+      // Kita hanya perlu menyimpan role untuk urusan rendering menu UI
+      localStorage.setItem("role", res.data.role);
       navigate("/dashboard");
     } catch (err) {
       setMessage(err.response?.data?.message || "Login gagal");
@@ -64,10 +66,6 @@ function Login() {
             MASUK
           </button>
         </form>
-
-        <p className="mt-6 text-center font-bold">
-          Belum punya akun? <Link to="/register" className="text-blue-600 underline hover:bg-yellow-200 px-1">Daftar sekarang</Link>
-        </p>
       </div>
     </div>
   );
