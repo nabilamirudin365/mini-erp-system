@@ -27,7 +27,7 @@ export const login = async (req, res) => {
       httpOnly: true, // Tidak bisa dibaca oleh JavaScript
       secure: process.env.NODE_ENV === "production", // True jika HTTPS
       sameSite: "strict",
-      maxAge: 60 * 1000 // 1 Menit (sesuai masa berlaku JWT)
+      maxAge: 60 * 60 * 1000 // 1 Jam (sesuai masa berlaku JWT)
     });
 
     // Kembalikan role ke user agar frontend tahu statusnya

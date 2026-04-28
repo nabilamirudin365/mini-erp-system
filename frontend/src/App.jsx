@@ -5,6 +5,7 @@ import Dashboard from "./pages/Dashboard";
 import Transaction from "./pages/Transaction";
 import ProtectedRoute from "./components/ProtectedRoute";
 import UserList from "./components/UserList";
+import ProductList from "./components/ProductList";
 
 function App() {
   return (
@@ -37,6 +38,14 @@ function App() {
           element={
             <ProtectedRoute>
               <UserList />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/products"
+          element={
+            <ProtectedRoute>
+              <ProductList />
             </ProtectedRoute>
           }
         />

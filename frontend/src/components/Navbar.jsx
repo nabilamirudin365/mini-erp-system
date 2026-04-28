@@ -17,7 +17,10 @@ function Navbar() {
         <Link to="/dashboard" className="font-bold hover:underline">Dashboard</Link>
         <Link to="/transaction" className="font-bold hover:underline">Transaksi</Link>
         {isAdmin && (
-          <Link to="/users" className="font-bold hover:underline bg-black text-white px-2 py-1 brutal-sm">User Management</Link>
+          <>
+            <Link to="/products" className="font-bold hover:underline bg-pink-300 text-black px-2 py-1 brutal-sm border-2 border-black">Product Management</Link>
+            <Link to="/users" className="font-bold hover:underline bg-black text-white px-2 py-1 brutal-sm border-2 border-black">User Management</Link>
+          </>
         )}
       </div>
 
