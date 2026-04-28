@@ -19,6 +19,7 @@ function Navbar() {
         {isAdmin && (
           <>
             <Link to="/products" className="font-bold hover:underline bg-pink-300 text-black px-2 py-1 brutal-sm border-2 border-black">Product Management</Link>
+            <Link to="/reports" className="font-bold hover:underline bg-green-300 text-black px-2 py-1 brutal-sm border-2 border-black">Analytics</Link>
             <Link to="/users" className="font-bold hover:underline bg-black text-white px-2 py-1 brutal-sm border-2 border-black">User Management</Link>
           </>
         )}

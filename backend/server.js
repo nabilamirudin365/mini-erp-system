@@ -7,6 +7,7 @@ import productRoutes from "./routes/productRoutes.js";
 import transactionRoutes from "./routes/transactionRoutes.js";
 import dashboardRoutes from "./routes/dashboardRoutes.js";
 import userRoutes from "./routes/userRoutes.js";
+import reportRoutes from "./routes/reportRoutes.js";
 
 dotenv.config();
 
@@ -28,6 +29,7 @@ app.use("/products", productRoutes);
 app.use("/transactions", transactionRoutes);
 app.use("/dashboard", dashboardRoutes);
 app.use("/users", userRoutes);
+app.use("/reports", reportRoutes);
 
 app.listen(5000, () => {
   console.log("Server jalan di http://localhost:5000");
