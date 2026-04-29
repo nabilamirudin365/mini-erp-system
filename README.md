@@ -69,7 +69,7 @@ npx prisma db push
 
 Run server:
 ```bash
-npm run dev
+npx nodemon server.js
 ```
 
 ---

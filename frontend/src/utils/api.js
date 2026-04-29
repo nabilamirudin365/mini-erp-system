@@ -1,8 +1,14 @@
 import axios from "axios";
 
+/* === INI DIPAKAI KETIKA DEVELOPMENT === */
 const api = axios.create({
   baseURL: "http://localhost:5000",
 });
+
+/* === INI DIPAKAI KETIKA PRODUCTION === */
+// const api = axios.create({
+//   baseURL: "https://mini-erp.onrender.com", // Ganti dengan URL Render Anda nanti
+// });
 
 // Izinkan pengiriman cookie lintas origin
 api.defaults.withCredentials = true;

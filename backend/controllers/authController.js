@@ -17,12 +17,21 @@ export const login = async (req, res, next) => {
     const { email, password } = req.body;
     const result = await authService.loginUser(email, password);
 
+    /* === INI DIPAKAI KETIKA DEVELOPMENT === */
     res.cookie("token", result.token, {
       httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: "strict",
+      secure: false, // Karena localhost biasanya HTTP
+      sameSite: "lax", // Mengizinkan cookie untuk localhost
       maxAge: 60 * 60 * 1000
     });
+
+    /* === INI DIPAKAI KETIKA PRODUCTION === */
+    // res.cookie("token", result.token, {
+    //   httpOnly: true,
+    //   secure: true, // Wajib true untuk HTTPS (Vercel/Render)
+    //   sameSite: "none", // Wajib "none" agar bisa beda domain (Cross-Site)
+    //   maxAge: 60 * 60 * 1000
+    // });
 
     return successResponse(res, 200, "Login berhasil", { role: result.user.role?.name || 'user' });
   } catch (error) {
