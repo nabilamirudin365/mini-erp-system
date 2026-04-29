@@ -151,8 +151,9 @@ export default function ProductList() {
                 <thead>
                   <tr className="bg-blue-200 border-b-4 border-black">
                     <th className="p-3 font-black border-r-4 border-black w-12 text-center">ID</th>
-                    <th className="p-3 font-black border-r-4 border-black">Nama Produk</th>
-                    <th className="p-3 font-black border-r-4 border-black text-right">Harga</th>
+                    <th className="p-3 font-black border-r-4 border-black text-center">Nama Produk</th>
+                    <th className="p-3 font-black border-r-4 border-black text-center">Kategori</th>
+                    <th className="p-3 font-black border-r-4 border-black text-center">Harga</th>
                     <th className="p-3 font-black border-r-4 border-black text-center">Stok</th>
                     <th className="p-3 font-black text-center">Aksi</th>
                   </tr>
@@ -162,6 +163,11 @@ export default function ProductList() {
                     <tr key={product.id} className="border-b-4 border-black last:border-b-0 hover:bg-yellow-100 transition-colors">
                       <td className="p-3 border-r-4 border-black font-bold text-center">{product.id}</td>
                       <td className="p-3 border-r-4 border-black font-bold">{product.name}</td>
+                      <td className="p-3 border-r-4 border-black font-bold">
+                        <span className="bg-gray-200 px-2 py-1 text-sm brutal-sm border-2 border-black">
+                          {product.category?.name || "Tanpa Kategori"}
+                        </span>
+                      </td>
                       <td className="p-3 border-r-4 border-black font-bold text-right">{formatRupiah(product.price)}</td>
                       <td className="p-3 border-r-4 border-black font-bold text-center">
                         <span className={`px-2 py-1 brutal-sm text-sm border-2 border-black ${product.stock <= 5 ? 'bg-red-400 text-white' : 'bg-green-400 text-black'}`}>
@@ -176,7 +182,7 @@ export default function ProductList() {
                   ))}
                   {products.length === 0 && (
                     <tr>
-                      <td colSpan="5" className="p-4 text-center font-bold">Belum ada data produk.</td>
+                      <td colSpan="6" className="p-4 text-center font-bold">Belum ada data produk.</td>
                     </tr>
                   )}
                 </tbody>

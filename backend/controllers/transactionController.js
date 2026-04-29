@@ -1,27 +1,37 @@
 import * as transactionService from "../services/transactionService.js";
+import { successResponse } from "../utils/response.js";
+import { AppError } from "../middleware/errorHandler.js";
 
-export const createTransaction = async (req, res) => {
+export const createTransaction = async (req, res, next) => {
   try {
     const { items } = req.body; 
 
-    // Controller bisa melakukan validasi struktur dasar
     if (!items || !Array.isArray(items) || items.length === 0) {
-      return res.status(400).json({ message: "Keranjang belanja kosong" });
+      return next(new AppError("Keranjang belanja kosong", 400));
     }
 
-    // Panggil Service Layer untuk menangani proses database yang rumit
     const result = await transactionService.createNewTransaction(req.user.id, items);
 
-    res.status(201).json({ message: "Transaksi berhasil", total: result.total });
+    return successResponse(res, 201, "Transaksi berhasil", { total: result.total });
 
   } catch (err) {
-    console.error("Create Transaction Error:", err);
-    
-    // Tangkap error kustom (seperti stok habis) dan kembalikan 400
     if (err.message.includes("Stok produk tidak mencukupi")) {
-      return res.status(400).json({ message: err.message });
+      return next(new AppError(err.message, 400));
     }
+    return next(new AppError("Gagal transaksi: " + err.message, 500));
+  }
+};
 
-    res.status(500).json({ message: "Gagal transaksi: " + err.message });
+export const getTransactionHistory = async (req, res, next) => {
+  try {
+    const userRole = req.user?.role;
+    const userId = req.user?.id;
+
+    const targetUserId = userRole === 'admin' ? null : userId;
+
+    const history = await transactionService.getAllTransactions(targetUserId);
+    return successResponse(res, 200, "Berhasil mengambil riwayat transaksi", history);
+  } catch (error) {
+    return next(new AppError("Gagal mengambil riwayat transaksi", 500));
   }
 };

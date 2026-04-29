@@ -1,53 +1,50 @@
 import * as productService from "../services/productService.js";
+import { successResponse } from "../utils/response.js";
+import { AppError } from "../middleware/errorHandler.js";
 
-export const getProducts = async (req, res) => {
+export const getProducts = async (req, res, next) => {
   try {
     const products = await productService.getAllProducts();
-    res.json(products);
+    return successResponse(res, 200, "Berhasil mengambil produk", products);
   } catch (error) {
-    console.error("Get Products Error:", error);
-    res.status(500).json({ message: "Gagal mengambil data produk" });
+    return next(new AppError("Gagal mengambil data produk", 500));
   }
 };
 
-export const createProduct = async (req, res) => {
+export const createProduct = async (req, res, next) => {
   try {
-    await productService.createNewProduct(req.body);
-    res.status(201).json({ message: "Product dibuat" });
+    const product = await productService.createNewProduct(req.body);
+    return successResponse(res, 201, "Product dibuat", product);
   } catch (error) {
-    console.error("Create Product Error:", error);
-    res.status(400).json({ message: error.message || "Gagal membuat produk" });
+    return next(new AppError(error.message || "Gagal membuat produk", 400));
   }
 };
 
-export const updateProduct = async (req, res) => {
+export const updateProduct = async (req, res, next) => {
   try {
     const { id } = req.params;
     const product = await productService.updateProduct(id, req.body);
-    res.json(product);
+    return successResponse(res, 200, "Produk berhasil diupdate", product);
   } catch (error) {
-    console.error("Update Product Error:", error);
     if (error.code === 'P2025') {
-       return res.status(404).json({ message: "Produk tidak ditemukan" });
+       return next(new AppError("Produk tidak ditemukan", 404));
     }
-    res.status(400).json({ message: error.message || "Gagal mengupdate produk" });
+    return next(new AppError(error.message || "Gagal mengupdate produk", 400));
   }
 };
 
-export const deleteProduct = async (req, res) => {
+export const deleteProduct = async (req, res, next) => {
   try {
     const { id } = req.params;
     await productService.deleteProduct(id);
-    res.json({ message: "Produk berhasil dihapus" });
+    return successResponse(res, 200, "Produk berhasil dihapus");
   } catch (error) {
-    console.error("Delete Product Error:", error);
     if (error.code === 'P2025') {
-       return res.status(404).json({ message: "Produk tidak ditemukan" });
+       return next(new AppError("Produk tidak ditemukan", 404));
     }
-    // Tangani error Foreign Key (jika produk sudah ada di transaksi)
     if (error.code === 'P2003') {
-       return res.status(400).json({ message: "Produk tidak dapat dihapus karena sudah memiliki riwayat transaksi" });
+       return next(new AppError("Produk tidak dapat dihapus karena sudah memiliki riwayat transaksi", 400));
     }
-    res.status(400).json({ message: error.message || "Gagal menghapus produk" });
+    return next(new AppError(error.message || "Gagal menghapus produk", 400));
   }
 };

@@ -9,7 +9,13 @@ api.defaults.withCredentials = true;
 
 // Tangkap error 401/403 secara global (Auto Logout)
 api.interceptors.response.use(
-  (response) => response, // Biarkan lewat jika sukses
+  (response) => {
+    // Jika format backend kita adalah successResponse, bongkar payload data-nya otomatis
+    if (response.data && response.data.status === "success" && response.data.data !== undefined) {
+      response.data = response.data.data;
+    }
+    return response;
+  },
   (error) => {
     // Jika backend membalas dengan status 401 (Unauthorized) atau 403 (Forbidden)
     if (error.response && (error.response.status === 401 || error.response.status === 403)) {

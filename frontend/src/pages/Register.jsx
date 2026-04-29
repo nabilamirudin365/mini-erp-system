@@ -3,6 +3,7 @@ import { Link, useNavigate } from "react-router-dom";
 import api from "../utils/api";
 
 function Register() {
+  const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [roleId, setRoleId] = useState("2");
@@ -14,6 +15,7 @@ function Register() {
     e.preventDefault();
     try {
       const res = await api.post("/auth/register", {
+        username,
         email,
         password,
         role_id: parseInt(roleId)
@@ -48,6 +50,16 @@ function Register() {
         )}
 
         <form onSubmit={handleRegister} className="flex flex-col gap-4">
+          <div>
+            <label className="block font-bold mb-1">Username</label>
+            <input
+              type="text"
+              placeholder="Masukkan username"
+              onChange={(e) => setUsername(e.target.value)}
+              className="w-full p-3 border-4 border-black outline-none focus:bg-pink-100 transition-colors"
+            />
+          </div>
+
           <div>
             <label className="block font-bold mb-1">Email</label>
             <input

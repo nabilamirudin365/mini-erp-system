@@ -2,7 +2,7 @@ import { prisma } from "../config/db.js";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 
-export const registerUser = async (email, password, role_id) => {
+export const registerUser = async (username, email, password, role_id) => {
   if (!email || !password) {
     throw new Error("Email dan password wajib diisi");
   }
@@ -12,6 +12,7 @@ export const registerUser = async (email, password, role_id) => {
 
   const user = await prisma.users.create({
     data: {
+      username: username || null,
       email,
       password: hash,
       role_id: role_id || 2,

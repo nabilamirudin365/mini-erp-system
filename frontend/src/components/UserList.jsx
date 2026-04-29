@@ -5,7 +5,7 @@ import { getUsers, createUser, updateUser, deleteUser } from "../services/userSe
 
 export default function UserList() {
   const [users, setUsers] = useState([]);
-  const [formData, setFormData] = useState({ email: "", password: "", role_id: 2 });
+  const [formData, setFormData] = useState({ username: "", email: "", password: "", role_id: 2 });
   const [editId, setEditId] = useState(null);
   const [error, setError] = useState("");
 
@@ -35,7 +35,7 @@ export default function UserList() {
       } else {
         await createUser(formData);
       }
-      setFormData({ email: "", password: "", role_id: 2 });
+      setFormData({ username: "", email: "", password: "", role_id: 2 });
       fetchData(); // Refresh data
     } catch (err) {
       setError(err.response?.data?.message || "Gagal menyimpan user");
@@ -43,7 +43,7 @@ export default function UserList() {
   };
 
   const handleEdit = (user) => {
-    setFormData({ email: user.email, password: "", role_id: user.role_id });
+    setFormData({ username: user.username || "", email: user.email, password: "", role_id: user.role_id });
     setEditId(user.id);
   };
 
@@ -83,6 +83,16 @@ export default function UserList() {
             <h3 className="font-black text-xl mb-4">{editId ? "Edit User" : "Tambah User"}</h3>
             <form onSubmit={handleSubmit} className="flex flex-col gap-4">
               <div>
+                <label className="block font-bold mb-1">Username</label>
+                <input
+                  type="text"
+                  value={formData.username}
+                  onChange={(e) => setFormData({ ...formData, username: e.target.value })}
+                  className="w-full p-2 border-4 border-black outline-none focus:bg-blue-100"
+                />
+              </div>
+
+              <div>
                 <label className="block font-bold mb-1">Email</label>
                 <input
                   type="email"
@@ -121,7 +131,7 @@ export default function UserList() {
                   {editId ? "SIMPAN" : "TAMBAH"}
                 </button>
                 {editId && (
-                  <button type="button" onClick={() => { setEditId(null); setFormData({ email: "", password: "", role_id: 2 }) }} className="bg-gray-300 font-black py-2 px-4 brutal-btn">
+                  <button type="button" onClick={() => { setEditId(null); setFormData({ username: "", email: "", password: "", role_id: 2 }) }} className="bg-gray-300 font-black py-2 px-4 brutal-btn">
                     BATAL
                   </button>
                 )}
@@ -136,6 +146,7 @@ export default function UserList() {
                 <thead>
                   <tr className="bg-blue-200 border-b-4 border-black">
                     <th className="p-3 font-black border-r-4 border-black">ID</th>
+                    <th className="p-3 font-black border-r-4 border-black">Username</th>
                     <th className="p-3 font-black border-r-4 border-black">Email</th>
                     <th className="p-3 font-black border-r-4 border-black">Role</th>
                     <th className="p-3 font-black">Aksi</th>
@@ -145,6 +156,7 @@ export default function UserList() {
                   {users.map((user) => (
                     <tr key={user.id} className="border-b-4 border-black last:border-b-0 hover:bg-yellow-100 transition-colors">
                       <td className="p-3 border-r-4 border-black font-bold">{user.id}</td>
+                      <td className="p-3 border-r-4 border-black font-bold">{user.username || "-"}</td>
                       <td className="p-3 border-r-4 border-black font-bold">{user.email}</td>
                       <td className="p-3 border-r-4 border-black font-bold">
                         <span className={`px-2 py-1 brutal-sm text-sm ${user.role_id === 1 ? 'bg-red-400 text-white' : 'bg-green-400'}`}>
@@ -159,7 +171,7 @@ export default function UserList() {
                   ))}
                   {users.length === 0 && (
                     <tr>
-                      <td colSpan="4" className="p-4 text-center font-bold">Belum ada data user.</td>
+                      <td colSpan="5" className="p-4 text-center font-bold">Belum ada data user.</td>
                     </tr>
                   )}
                 </tbody>

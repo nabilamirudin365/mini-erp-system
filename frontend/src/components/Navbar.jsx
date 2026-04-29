@@ -16,6 +16,7 @@ function Navbar() {
         <h1 className="font-bold text-xl bg-yellow-300 px-2 py-1 brutal-sm border-2 border-black mr-4">ERP</h1>
         <Link to="/dashboard" className="font-bold hover:underline">Dashboard</Link>
         <Link to="/transaction" className="font-bold hover:underline">Transaksi</Link>
+        <Link to="/history" className="font-bold hover:underline bg-purple-300 text-black px-2 py-1 brutal-sm border-2 border-black">Riwayat</Link>
         {isAdmin && (
           <>
             <Link to="/products" className="font-bold hover:underline bg-pink-300 text-black px-2 py-1 brutal-sm border-2 border-black">Product Management</Link>

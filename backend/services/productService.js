@@ -8,6 +8,9 @@ export const getAllProducts = async () => {
       price: true,
       stock: true,
       category_id: true,
+      category: {
+        select: { name: true }
+      }
     }
   });
 };

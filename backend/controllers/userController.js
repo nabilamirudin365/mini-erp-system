@@ -1,61 +1,54 @@
 import * as userService from "../services/userService.js";
+import { successResponse } from "../utils/response.js";
+import { AppError } from "../middleware/errorHandler.js";
 
-export const getUsers = async (req, res) => {
+export const getUsers = async (req, res, next) => {
   try {
     const users = await userService.getAllUsers();
-    res.json(users);
+    return successResponse(res, 200, "Berhasil mengambil data users", users);
   } catch (error) {
-    console.error("Get Users Error:", error);
-    res.status(500).json({ message: "Gagal mengambil data users" });
+    return next(new AppError("Gagal mengambil data users", 500));
   }
 };
 
-export const getUsersById = async (req, res) => {
+export const getUsersById = async (req, res, next) => {
   try {
     const { id } = req.params;
     const user = await userService.getUserById(id);
-    
-    res.json(user);
+    return successResponse(res, 200, "Berhasil mengambil data user", user);
   } catch (error) {
-    console.error("Get User By ID Error:", error);
-    
-    // Penanganan error dari service
     if (error.message === "User tidak ditemukan") {
-      return res.status(404).json({ message: error.message });
+      return next(new AppError(error.message, 404));
     }
     if (error.message === "ID tidak valid") {
-      return res.status(400).json({ message: error.message });
+      return next(new AppError(error.message, 400));
     }
-    
-    res.status(500).json({ message: "Gagal mengambil data user" });
+    return next(new AppError("Gagal mengambil data user", 500));
   }
 };
 
-export const updateUser = async (req, res) => {
+export const updateUser = async (req, res, next) => {
   try {
     const { id } = req.params;
     const user = await userService.updateUser(id, req.body);
-    res.json(user);
+    return successResponse(res, 200, "Berhasil update user", user);
   } catch (error) {
-    console.error("Update User Error:", error);
-    // Prisma error code P2025: Record to update not found
     if (error.code === 'P2025') {
-       return res.status(404).json({ message: "User tidak ditemukan" });
+       return next(new AppError("User tidak ditemukan", 404));
     }
-    res.status(400).json({ message: error.message || "Gagal update user" });
+    return next(new AppError(error.message || "Gagal update user", 400));
   }
 };
 
-export const deleteUser = async (req, res) => {
+export const deleteUser = async (req, res, next) => {
   try {
     const { id } = req.params;
     await userService.deleteUser(id);
-    res.json({ message: "User berhasil dihapus" });
+    return successResponse(res, 200, "User berhasil dihapus");
   } catch (error) {
-    console.error("Delete User Error:", error);
     if (error.code === 'P2025') {
-       return res.status(404).json({ message: "User tidak ditemukan" });
+       return next(new AppError("User tidak ditemukan", 404));
     }
-    res.status(400).json({ message: error.message || "Gagal menghapus user" });
+    return next(new AppError(error.message || "Gagal menghapus user", 400));
   }
 };

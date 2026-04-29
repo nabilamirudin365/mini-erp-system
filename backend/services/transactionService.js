@@ -67,3 +67,27 @@ export const createNewTransaction = async (userId, items) => {
 
   return result;
 };
+
+export const getAllTransactions = async (userId = null) => {
+  // Jika userId ada, filter hanya milik user tersebut. Jika null, ambil semua.
+  const whereClause = userId ? { user_id: userId } : {};
+
+  return await prisma.transactions.findMany({
+    where: whereClause,
+    orderBy: {
+      created_at: 'desc' // Urutkan dari yang terbaru
+    },
+    include: {
+      user: {
+        select: { email: true, username: true } // Ambil email dan username
+      },
+      transaction_items: {
+        include: {
+          product: {
+            select: { name: true } // Ambil nama produk dari tabel produk
+          }
+        }
+      }
+    }
+  });
+};

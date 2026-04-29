@@ -1,23 +1,23 @@
 import * as reportService from "../services/reportService.js";
+import { successResponse } from "../utils/response.js";
+import { AppError } from "../middleware/errorHandler.js";
 
-export const getSalesTrend = async (req, res) => {
+export const getSalesTrend = async (req, res, next) => {
   try {
     const days = parseInt(req.query.days) || 7;
     const data = await reportService.getSalesTrend(days);
-    res.json(data);
+    return successResponse(res, 200, "Berhasil mengambil data tren penjualan", data);
   } catch (error) {
-    console.error("Sales Trend Error:", error);
-    res.status(500).json({ message: "Gagal mengambil data tren penjualan" });
+    return next(new AppError("Gagal mengambil data tren penjualan", 500));
   }
 };
 
-export const getTopProducts = async (req, res) => {
+export const getTopProducts = async (req, res, next) => {
   try {
     const limit = parseInt(req.query.limit) || 5;
     const data = await reportService.getTopProducts(limit);
-    res.json(data);
+    return successResponse(res, 200, "Berhasil mengambil data produk terlaris", data);
   } catch (error) {
-    console.error("Top Products Error:", error);
-    res.status(500).json({ message: "Gagal mengambil data produk terlaris" });
+    return next(new AppError("Gagal mengambil data produk terlaris", 500));
   }
 };

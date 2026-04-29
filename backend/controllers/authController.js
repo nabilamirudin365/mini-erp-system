@@ -1,46 +1,36 @@
 import * as authService from "../services/authService.js";
+import { successResponse } from "../utils/response.js";
+import { AppError } from "../middleware/errorHandler.js";
 
-export const register = async (req, res) => {
+export const register = async (req, res, next) => {
   try {
-    const { email, password, role_id } = req.body;
-
-    // Controller hanya meneruskan data ke Service (Tidak ada logika DB/Bcrypt disini)
-    await authService.registerUser(email, password, role_id);
-
-    // Controller murni mengurus respons (HTTP status dan JSON)
-    res.status(201).json({ message: "Register berhasil" });
+    const { username, email, password, role_id } = req.body;
+    await authService.registerUser(username, email, password, role_id);
+    return successResponse(res, 201, "Register berhasil");
   } catch (error) {
-    console.error("Register Error:", error);
-    res.status(400).json({ message: error.message || "Terjadi kesalahan pada server saat register" });
+    return next(new AppError(error.message, 400));
   }
 };
 
-export const login = async (req, res) => {
+export const login = async (req, res, next) => {
   try {
     const { email, password } = req.body;
-
-    // Panggil Service
     const result = await authService.loginUser(email, password);
 
-    // Tanamkan token ke dalam HttpOnly Cookie (Brankas Browser)
     res.cookie("token", result.token, {
-      httpOnly: true, // Tidak bisa dibaca oleh JavaScript
-      secure: process.env.NODE_ENV === "production", // True jika HTTPS
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
       sameSite: "strict",
-      maxAge: 60 * 60 * 1000 // 1 Jam (sesuai masa berlaku JWT)
+      maxAge: 60 * 60 * 1000
     });
 
-    // Kembalikan role ke user agar frontend tahu statusnya
-    res.json({ 
-      role: result.user.role?.name || 'user'
-    });
+    return successResponse(res, 200, "Login berhasil", { role: result.user.role?.name || 'user' });
   } catch (error) {
-    console.error("Login Error:", error);
-    res.status(400).json({ message: error.message || "Terjadi kesalahan pada server saat login" });
+    return next(new AppError(error.message, 400));
   }
 };
 
 export const logout = (req, res) => {
-  res.clearCookie("token"); // Hapus cookie
-  res.json({ message: "Berhasil logout" });
+  res.clearCookie("token");
+  return successResponse(res, 200, "Berhasil logout");
 };
