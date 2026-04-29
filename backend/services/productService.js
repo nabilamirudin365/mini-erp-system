@@ -1,18 +1,38 @@
 import { prisma } from "../config/db.js";
 
-export const getAllProducts = async () => {
-  return await prisma.products.findMany({
-    select: {
-      id: true,
-      name: true,
-      price: true,
-      stock: true,
-      category_id: true,
-      category: {
-        select: { name: true }
+export const getAllProducts = async (page = 1, limit = 100) => {
+  const skip = (page - 1) * limit;
+
+  const [data, total] = await Promise.all([
+    prisma.products.findMany({
+      where: { is_deleted: false },
+      skip,
+      take: limit,
+      select: {
+        id: true,
+        name: true,
+        price: true,
+        stock: true,
+        category_id: true,
+        category: {
+          select: { name: true }
+        }
       }
+    }),
+    prisma.products.count({
+      where: { is_deleted: false }
+    })
+  ]);
+
+  return {
+    items: data, // Return objects inside items
+    meta: {
+      total,
+      page,
+      limit,
+      totalPages: Math.ceil(total / limit)
     }
-  });
+  };
 };
 
 export const createNewProduct = async (data) => {
@@ -58,7 +78,8 @@ export const deleteProduct = async (id) => {
   const productId = parseInt(id);
   if (isNaN(productId)) throw new Error("ID tidak valid");
 
-  await prisma.products.delete({
-    where: { id: productId }
+  await prisma.products.update({
+    where: { id: productId },
+    data: { is_deleted: true }
   });
 };

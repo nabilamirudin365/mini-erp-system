@@ -1,8 +1,8 @@
 import api from "../utils/api";
 
-export const getProducts = async () => {
-  const response = await api.get('/products');
-  return response.data;
+export const getProducts = async (page = 1, limit = 10) => {
+  const response = await api.get(`/products?page=${page}&limit=${limit}`);
+  return response.data?.data || response.data;
 };
 
 export const createProduct = async (data) => {

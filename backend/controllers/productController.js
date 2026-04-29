@@ -4,7 +4,10 @@ import { AppError } from "../middleware/errorHandler.js";
 
 export const getProducts = async (req, res, next) => {
   try {
-    const products = await productService.getAllProducts();
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 10;
+    
+    const products = await productService.getAllProducts(page, limit);
     return successResponse(res, 200, "Berhasil mengambil produk", products);
   } catch (error) {
     return next(new AppError("Gagal mengambil data produk", 500));

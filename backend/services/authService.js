@@ -34,8 +34,8 @@ export const loginUser = async (email, password) => {
     },
   });
 
-  if (!user) {
-    throw new Error("User tidak ada");
+  if (!user || user.is_deleted) {
+    throw new Error("User tidak ada atau akun telah dinonaktifkan");
   }
 
   const valid = await bcrypt.compare(String(password), user.password);

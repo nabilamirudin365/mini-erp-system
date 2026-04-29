@@ -14,6 +14,7 @@ model users {
   password   String
   role_id    Int?
   created_at DateTime? @default(now())
+  is_deleted Boolean   @default(false)
 
   role         roles?         @relation(fields: [role_id], references: [id])
   transactions transactions[]
@@ -40,6 +41,7 @@ model products {
   stock       Int?
   category_id Int?
   created_at  DateTime? @default(now())
+  is_deleted  Boolean   @default(false)
 
   category          categories?         @relation(fields: [category_id], references: [id])
   transaction_items transaction_items[]

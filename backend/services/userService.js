@@ -2,6 +2,7 @@ import { prisma } from "../config/db.js";
 
 export const getAllUsers = async () => {
   const users = await prisma.users.findMany({
+    where: { is_deleted: false },
     select: {
       id: true,
       username: true,
@@ -25,8 +26,8 @@ export const getUserById = async (id) => {
     throw new Error("ID tidak valid");
   }
 
-  const user = await prisma.users.findUnique({
-    where: { id: userId },
+  const user = await prisma.users.findFirst({
+    where: { id: userId, is_deleted: false },
     select: {
       id: true,
       username: true,
@@ -77,7 +78,8 @@ export const deleteUser = async (id) => {
   const userId = parseInt(id);
   if (isNaN(userId)) throw new Error("ID tidak valid");
 
-  await prisma.users.delete({
-    where: { id: userId }
+  await prisma.users.update({
+    where: { id: userId },
+    data: { is_deleted: true }
   });
 };

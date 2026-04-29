@@ -6,6 +6,8 @@ import { formatRupiah } from "../utils/format";
 
 export default function ProductList() {
   const [products, setProducts] = useState([]);
+  const [page, setPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
   const [formData, setFormData] = useState({ name: "", price: "", stock: "", category_id: "" });
   const [editId, setEditId] = useState(null);
   const [error, setError] = useState("");
@@ -14,12 +16,17 @@ export default function ProductList() {
 
   useEffect(() => {
     fetchData();
-  }, []);
+  }, [page]);
 
   const fetchData = async () => {
     try {
-      const data = await getProducts();
-      setProducts(data);
+      const data = await getProducts(page, 10);
+      if (data.items) {
+        setProducts(data.items);
+        setTotalPages(data.meta.totalPages || 1);
+      } else {
+        setProducts(data);
+      }
     } catch (err) {
       setError("Gagal memuat data produk");
     }
@@ -187,6 +194,26 @@ export default function ProductList() {
                   )}
                 </tbody>
               </table>
+
+              {totalPages > 1 && (
+                <div className="flex justify-between items-center p-4 border-t-4 border-black bg-gray-100">
+                  <button 
+                    disabled={page === 1} 
+                    onClick={() => setPage(page - 1)}
+                    className="brutal-btn bg-yellow-300 font-black px-4 py-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    SEBELUMNYA
+                  </button>
+                  <span className="font-bold">Halaman {page} dari {totalPages}</span>
+                  <button 
+                    disabled={page === totalPages} 
+                    onClick={() => setPage(page + 1)}
+                    className="brutal-btn bg-yellow-300 font-black px-4 py-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    SELANJUTNYA
+                  </button>
+                </div>
+              )}
             </div>
           </div>
         </div>
