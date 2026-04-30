@@ -15,7 +15,8 @@ function Transaction() {
     const fetchProducts = async () => {
       try {
         const res = await api.get("/products");
-        setProducts(res.data);
+        // Karena API kita mereturn { success: true, data: { items: [...] } }
+        setProducts(res.data.data.items);
       } catch (err) {
         console.error(err);
       }
