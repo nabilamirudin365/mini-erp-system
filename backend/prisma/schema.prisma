@@ -9,13 +9,14 @@ datasource db {
 }
 
 model users {
-  id         Int       @id @default(autoincrement())
-  username   String?
-  email      String    @unique
-  password   String
-  role_id    Int?
-  created_at DateTime? @default(now())
-  is_deleted Boolean   @default(false)
+  id            Int       @id @default(autoincrement())
+  username      String?
+  email         String    @unique
+  password      String
+  role_id       Int?
+  session_token String?   // Token sesi aktif, untuk mencegah login ganda
+  created_at    DateTime? @default(now())
+  is_deleted    Boolean   @default(false)
 
   role         roles?         @relation(fields: [role_id], references: [id])
   transactions transactions[]

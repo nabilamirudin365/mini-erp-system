@@ -1,6 +1,7 @@
 import * as authService from "../services/authService.js";
 import { successResponse } from "../utils/response.js";
 import { AppError } from "../middleware/errorHandler.js";
+import jwt from "jsonwebtoken";
 
 export const register = async (req, res, next) => {
   try {
@@ -39,7 +40,22 @@ export const login = async (req, res, next) => {
   }
 };
 
-export const logout = (req, res) => {
-  res.clearCookie("token");
+export const logout = async (req, res) => {
+  try {
+    // Ambil user ID dari cookie JWT untuk menghapus session_token di DB
+    const token = req.cookies?.token;
+    if (token) {
+      const decoded = jwt.verify(token, process.env.JWT_SECRET);
+      await authService.logoutUser(decoded.id);
+    }
+  } catch {
+    // Jika token sudah expired atau tidak valid, tidak masalah, lanjutkan logout
+  }
+
+  res.clearCookie("token", {
+    httpOnly: true,
+    secure: true,
+    sameSite: "none",
+  });
   return successResponse(res, 200, "Berhasil logout");
 };

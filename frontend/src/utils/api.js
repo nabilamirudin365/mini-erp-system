@@ -31,7 +31,15 @@ api.interceptors.response.use(
       // Cegah infinite loop jika sudah berada di halaman login
       if (window.location.pathname !== "/") {
         localStorage.clear();
-        alert("Sesi Anda telah berakhir. Silakan login kembali.");
+
+        // Pesan berbeda jika sesi ditendang oleh login perangkat lain
+        const code = error.response.data?.code;
+        if (code === "SESSION_REPLACED") {
+          alert("⚠️ Akun Anda baru saja login di perangkat lain. Sesi ini diakhiri secara otomatis.");
+        } else {
+          alert("Sesi Anda telah berakhir. Silakan login kembali.");
+        }
+
         // Pastikan semua data sesi dihapus
         window.location.href = "/"; // Paksa pindah ke halaman login
       }
