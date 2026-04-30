@@ -116,7 +116,7 @@ function Transaction() {
     <Layout>
       <Navbar />
 
-      <div className="grid grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {/* ================== LIST PRODUK ================== */}
         <div>
           <h2 className="mb-2 font-bold text-lg border-b-4 border-black inline-block">
