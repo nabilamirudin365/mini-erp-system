@@ -1,14 +1,14 @@
 import axios from "axios";
 
 /* === INI DIPAKAI KETIKA DEVELOPMENT === */
-const api = axios.create({
-  baseURL: "http://localhost:5000",
-});
+// const api = axios.create({
+//   baseURL: "http://localhost:5000",
+// });
 
 /* === INI DIPAKAI KETIKA PRODUCTION === */
-// const api = axios.create({
-//   baseURL: "https://mini-erp.onrender.com", // Ganti dengan URL Render Anda nanti
-// });
+const api = axios.create({
+  baseURL: "https://mini-erp-backend-pied.vercel.app", // url backend vercel
+});
 
 // Izinkan pengiriman cookie lintas origin
 api.defaults.withCredentials = true;
@@ -26,13 +26,13 @@ api.interceptors.response.use(
     // Jika backend membalas dengan status 401 (Unauthorized) atau 403 (Forbidden)
     if (error.response && (error.response.status === 401 || error.response.status === 403)) {
       // Hapus sesi pengguna dari penyimpanan peramban
-      localStorage.clear(); 
-      
+      localStorage.clear();
+
       // Cegah infinite loop jika sudah berada di halaman login
       if (window.location.pathname !== "/") {
         localStorage.clear();
         alert("Sesi Anda telah berakhir. Silakan login kembali.");
-         // Pastikan semua data sesi dihapus
+        // Pastikan semua data sesi dihapus
         window.location.href = "/"; // Paksa pindah ke halaman login
       }
     }

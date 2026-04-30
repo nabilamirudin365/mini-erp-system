@@ -15,16 +15,17 @@ dotenv.config();
 
 const app = express();
 /* === INI DIPAKAI KETIKA DEVELOPMENT === */
-app.use(cors({
-  credentials: true,
-  origin: "http://localhost:5173"
-}));
-
-/* === INI DIPAKAI KETIKA PRODUCTION === */
 // app.use(cors({
 //   credentials: true,
-//   origin: "https://mini-erp.vercel.app" // Ganti dengan URL Vercel Anda nanti
+//   origin: "http://localhost:5173"
 // }));
+
+/* === INI DIPAKAI KETIKA PRODUCTION === */
+app.use(cors({
+  credentials: true,
+  origin: true  // Ganti dengan URL Vercel Anda nanti
+}));
+
 app.use(express.json());
 app.use(cookieParser());
 app.use(morgan("dev"));
