@@ -43,6 +43,10 @@ app.use("/reports", reportRoutes);
 
 app.use(errorHandler);
 
-app.listen(5000, () => {
-  console.log("Server jalan di http://localhost:5000");
-});
+if (process.env.NODE_ENV !== "production") {
+  app.listen(5000, () => {
+    console.log("Server jalan di http://localhost:5000");
+  });
+}
+
+export default app;
