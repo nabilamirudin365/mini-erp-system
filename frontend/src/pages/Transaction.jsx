@@ -15,8 +15,8 @@ function Transaction() {
     const fetchProducts = async () => {
       try {
         const res = await api.get("/products");
-        // Karena API kita mereturn { success: true, data: { items: [...] } }
-        setProducts(res.data.data.items);
+        // Interceptor telah membongkar response.data, sehingga res.data bernilai { items: [...], meta: {...} }
+        setProducts(res.data.items || []);
       } catch (err) {
         console.error(err);
       }
