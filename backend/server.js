@@ -14,16 +14,11 @@ import reportRoutes from "./routes/reportRoutes.js";
 dotenv.config();
 
 const app = express();
-/* === INI DIPAKAI KETIKA DEVELOPMENT === */
-// app.use(cors({
-//   credentials: true,
-//   origin: "http://localhost:5173"
-// }));
+const isProd = process.env.NODE_ENV === "production";
 
-/* === INI DIPAKAI KETIKA PRODUCTION === */
 app.use(cors({
   credentials: true,
-  origin: true  // Ganti dengan URL Vercel Anda nanti
+  origin: isProd ? process.env.FRONTEND_URL : "http://localhost:5173"
 }));
 
 app.use(express.json());

@@ -1,13 +1,8 @@
 import axios from "axios";
 
-/* === INI DIPAKAI KETIKA DEVELOPMENT === */
-// const api = axios.create({
-//   baseURL: "http://localhost:5000",
-// });
-
-/* === INI DIPAKAI KETIKA PRODUCTION === */
+// Otomatis: membaca dari env variable, fallback ke localhost saat development
 const api = axios.create({
-  baseURL: "https://mini-erp-backend-pied.vercel.app", // url backend vercel
+  baseURL: import.meta.env.VITE_API_URL || "http://localhost:5000",
 });
 
 // Izinkan pengiriman cookie lintas origin
